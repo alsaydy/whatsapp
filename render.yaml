@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: whatsapp-sender
+    name: whatsapp
     env: docker
     plan: free
     dockerfilePath: Dockerfile
