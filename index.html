@@ -52,9 +52,7 @@
     <form id="whatsappForm" enctype="multipart/form-data">
       <div class="mb-3">
         <label class="form-label">أرقام المستلمين (كل رقم في سطر)</label>
-        <textarea class="form-control" name="numbers" rows="4" required placeholder="مثال:
-9665XXXXXXXX
-9677XXXXXXXX"></textarea>
+        <textarea class="form-control" name="numbers" rows="4" required placeholder="مثال:\n9665XXXXXXXX\n9677XXXXXXXX"></textarea>
       </div>
       <div class="mb-3">
         <label class="form-label">الرسالة</label>
@@ -84,20 +82,20 @@
       })
       .then(res => res.json())
       .then(data => {
-        if (data.results) {
-          let output = "✅ تم إرسال الرسائل:
-";
-          data.results.forEach(r => {
-            output += `📱 ${r.to} - ${r.status?.message ?? "تم"}
-`;
+        let output = '';
+        if (data.results && data.results.length > 0) {
+          output += '📤 النتائج:\n';
+          data.results.forEach((res, i) => {
+            const status = res.status?.error ?? res.status?.message ?? '❌ غير معروف';
+            output += `🔢 ${i+1} - ${res.to} => ${status}\n`;
           });
-          resultDiv.textContent = output;
         } else {
-          resultDiv.textContent = '❌ حدث خطأ في الإرسال';
+          output = '❌ لم يتم استلام رد من الخادم.';
         }
+        resultDiv.textContent = output;
       })
-      .catch(() => {
-        resultDiv.textContent = '❌ فشل الاتصال بالخادم.';
+      .catch(err => {
+        resultDiv.textContent = '❌ خطأ في الاتصال بالخادم: ' + err.message;
       });
     });
   </script>
