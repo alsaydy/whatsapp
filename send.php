@@ -1,8 +1,10 @@
 <?php
+header('Content-Type: application/json');
+
 $instanceId = "instance112832";
 $token = "1j6hcc8n7svgqlv1";
 
-$numbers = explode("\n", trim($_POST['numbers']));
+$numbers = explode("\\n", trim($_POST['numbers']));
 $message = trim($_POST['message']);
 $imageUrl = null;
 
@@ -27,21 +29,20 @@ foreach ($numbers as $number) {
     $number = trim($number);
     if ($number === '') continue;
 
+    $url = $imageUrl 
+        ? "https://api.ultramsg.com/{$instanceId}/messages/image"
+        : "https://api.ultramsg.com/{$instanceId}/messages/chat";
+
+    $data = [
+        "token" => $token,
+        "to" => $number
+    ];
+
     if ($imageUrl) {
-        $data = [
-            "token" => $token,
-            "to" => $number,
-            "image" => $imageUrl,
-            "caption" => $message
-        ];
-        $url = "https://api.ultramsg.com/{$instanceId}/messages/image";
+        $data["image"] = $imageUrl;
+        $data["caption"] = $message;
     } else {
-        $data = [
-            "token" => $token,
-            "to" => $number,
-            "body" => $message
-        ];
-        $url = "https://api.ultramsg.com/{$instanceId}/messages/chat";
+        $data["body"] = $message;
     }
 
     $ch = curl_init($url);
@@ -50,17 +51,15 @@ foreach ($numbers as $number) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/x-www-form-urlencoded"]);
     $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     $results[] = [
         "to" => $number,
-        "status" => json_decode($response, true)
+        "status" => json_decode($response, true),
+        "http_code" => $httpCode
     ];
 }
 
-header('Content-Type: application/json');
-echo json_encode([
-    "message" => "تم إرسال الرسائل",
-    "results" => $results
-], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+echo json_encode(["results" => $results], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 ?>
