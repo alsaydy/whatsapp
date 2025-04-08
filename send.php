@@ -1,6 +1,6 @@
 <?php
-$instance_id = "YOUR_INSTANCE_ID"; // <-- استبدلها
-$token = "YOUR_TOKEN";             // <-- استبدلها
+$instanceId = "instance112832";
+$token = "1j6hcc8n7svgqlv1";
 
 $numbers = explode(",", $_POST['numbers']);
 $message = $_POST['message'];
