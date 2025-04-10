@@ -1,8 +1,7 @@
-FROM php:8.1-cli
+FROM php:8.2-apache
 
-WORKDIR /var/www/html
-COPY . .
+COPY . /var/www/html/
 
-EXPOSE 10000
+RUN docker-php-ext-install mysqli && a2enmod rewrite
 
-CMD ["php", "-S", "0.0.0.0:10000"]
+RUN chown -R www-data:www-data /var/www/html
